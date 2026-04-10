@@ -5,6 +5,8 @@ from pathlib import Path
 from .static_analyzer import scan_project
 from .dynamic_analyzer import run_dynamic_analysis
 from .dynamic_analyzer.findings import DynamicFinding
+from .rag.indexer import index_knowledge_base
+from .config import DEFAULT_KB_DIR, DEFAULT_CHROMA_DIR
 
 _SEVERITY_COLOR = {
     "HIGH": "red",
@@ -80,3 +82,25 @@ def scan(project_path: str, static: bool, dynamic_url: str):
 
     high_count = sum(1 for f in all_findings if f.severity == "HIGH")
     sys.exit(1 if high_count > 0 else 0)
+
+
+@cli.command("index-kb")
+@click.option("--kb-dir", default=DEFAULT_KB_DIR, show_default=True,
+              help="Directorio con los documentos de la knowledge base.")
+@click.option("--chroma-dir", default=DEFAULT_CHROMA_DIR, show_default=True,
+              help="Directorio donde ChromaDB persiste los vectores.")
+@click.option("--reset", is_flag=True, default=False,
+              help="Eliminar la colección existente antes de indexar.")
+def index_kb(kb_dir: str, chroma_dir: str, reset: bool):
+    """Vectoriza la knowledge base OWASP/DRF en ChromaDB."""
+    click.echo(f"Indexando documentos de: {kb_dir}")
+    click.echo(f"ChromaDB en: {chroma_dir}")
+    if reset:
+        click.secho("  Modo reset: se eliminará la colección existente.", fg="yellow")
+
+    try:
+        count = index_knowledge_base(kb_dir, chroma_dir, reset=reset)
+        click.secho(f"  {count} chunks indexados correctamente.", fg="green")
+    except Exception as exc:
+        click.secho(f"Error al indexar: {exc}", fg="red", err=True)
+        sys.exit(1)
