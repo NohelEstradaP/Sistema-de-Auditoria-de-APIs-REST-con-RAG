@@ -6,6 +6,7 @@ from .static_analyzer import scan_project
 from .dynamic_analyzer import run_dynamic_analysis
 from .dynamic_analyzer.findings import DynamicFinding
 from .rag.indexer import index_knowledge_base
+from .rag.generator import enrich_findings, DEFAULT_MODEL
 from .config import DEFAULT_KB_DIR, DEFAULT_CHROMA_DIR
 
 _SEVERITY_COLOR = {
@@ -14,6 +15,20 @@ _SEVERITY_COLOR = {
     "LOW": "cyan",
     "INFO": "white",
 }
+
+
+def _print_recommendations(recommendations):
+    if not recommendations:
+        return
+    click.echo()
+    click.secho("═" * 60, bold=True)
+    click.secho("  RECOMENDACIONES LLM (con RAG)", bold=True)
+    click.secho("═" * 60, bold=True)
+    for rec in recommendations:
+        click.secho(f"\n▶ {rec.rule_id}", fg="cyan", bold=True)
+        click.echo(rec.recommendation)
+        if rec.sources:
+            click.secho("  Fuentes: " + " | ".join(rec.sources), fg="white")
 
 
 def _print_findings(findings):
@@ -59,7 +74,14 @@ def cli():
               help="Ejecutar análisis estático (AST).")
 @click.option("--dynamic", "dynamic_url", default=None, metavar="URL",
               help="URL base de la API para análisis dinámico (ej. http://localhost:8000).")
-def scan(project_path: str, static: bool, dynamic_url: str):
+@click.option("--rag", is_flag=True, default=False,
+              help="Enriquecer hallazgos con recomendaciones LLM vía RAG (requiere Ollama).")
+@click.option("--model", default=DEFAULT_MODEL, show_default=True,
+              help="Modelo Ollama a usar para las recomendaciones RAG.")
+@click.option("--chroma-dir", default=DEFAULT_CHROMA_DIR, show_default=True,
+              help="Directorio ChromaDB con la knowledge base indexada.")
+def scan(project_path: str, static: bool, dynamic_url: str,
+         rag: bool, model: str, chroma_dir: str):
     """Audita PROJECT_PATH en busca de vulnerabilidades OWASP API Top 10."""
     path = Path(project_path).resolve()
     click.echo(f"Auditando: {path}")
@@ -79,6 +101,15 @@ def scan(project_path: str, static: bool, dynamic_url: str):
         click.echo(f"  {len(findings)} hallazgo(s) encontrado(s).")
 
     _print_findings(all_findings)
+
+    if rag and all_findings:
+        click.echo(f"\n→ Generando recomendaciones con RAG ({model})...")
+        try:
+            recs = enrich_findings(all_findings, chroma_dir=chroma_dir, model=model)
+            click.echo(f"  {len(recs)} recomendación(es) generada(s).")
+            _print_recommendations(recs)
+        except Exception as exc:
+            click.secho(f"  Advertencia RAG: {exc}", fg="yellow")
 
     high_count = sum(1 for f in all_findings if f.severity == "HIGH")
     sys.exit(1 if high_count > 0 else 0)
