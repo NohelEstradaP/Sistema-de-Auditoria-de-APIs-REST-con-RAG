@@ -1,0 +1,397 @@
+\documentclass[12pt, a4paper]{article}
+
+% Paquetes
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usepackage{pgfgantt}
+\usepackage{tcolorbox}
+\usepackage{hyperref}
+\usepackage{parskip}
+\usepackage{setspace}
+
+\tcbuselibrary{skins, breakable}
+
+% Colores
+\definecolor{primary}{RGB}{24, 95, 165}
+\definecolor{primarylight}{RGB}{230, 241, 251}
+\definecolor{success}{RGB}{15, 110, 86}
+\definecolor{successlight}{RGB}{234, 243, 222}
+\definecolor{warning}{RGB}{132, 79, 11}
+\definecolor{warninglight}{RGB}{250, 238, 218}
+\definecolor{purple}{RGB}{60, 52, 137}
+\definecolor{purplelight}{RGB}{238, 237, 254}
+\definecolor{danger}{RGB}{163, 45, 45}
+\definecolor{dangerlight}{RGB}{252, 235, 235}
+\definecolor{tealcolor}{RGB}{15, 110, 86}
+\definecolor{teallight}{RGB}{225, 245, 238}
+\definecolor{graylight}{RGB}{241, 239, 232}
+\definecolor{graydark}{RGB}{95, 94, 90}
+\definecolor{textprimary}{RGB}{28, 28, 26}
+\definecolor{textsecondary}{RGB}{100, 98, 92}
+
+% Hipervinculos
+\hypersetup{
+  colorlinks=true,
+  linkcolor=primary,
+  urlcolor=primary,
+  pdftitle={Plan de Proyecto - Sistema de Auditoria de APIs REST con RAG}
+}
+
+% Secciones
+\titleformat{\section}
+  {\large\bfseries\color{primary}}
+  {}
+  {0em}
+  {}
+  [\vspace{-4pt}\textcolor{primary!40}{\rule{\linewidth}{0.5pt}}\vspace{4pt}]
+
+\titleformat{\subsection}
+  {\normalsize\bfseries\color{textprimary}}
+  {}
+  {0em}
+  {}
+
+\titlespacing*{\section}{0pt}{20pt}{8pt}
+\titlespacing*{\subsection}{0pt}{14pt}{4pt}
+
+% Encabezado
+\setlength{\headheight}{15pt}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{graydark} Plan de Proyecto}
+\fancyhead[R]{\small\color{graydark} Auditoria de APIs REST en DRF con RAG}
+\fancyfoot[C]{\small\color{graydark}\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Cajas de color
+\tcbset{
+  basebox/.style={
+    enhanced, breakable,
+    left=10pt, right=10pt, top=8pt, bottom=8pt,
+    arc=4pt, boxrule=0.5pt,
+    fonttitle=\small\bfseries,
+  }
+}
+
+\newtcolorbox{infobox}[1][]{basebox,
+  colback=primarylight, colframe=primary!50, coltitle=primary, #1}
+
+\newtcolorbox{successbox}[1][]{basebox,
+  colback=successlight, colframe=success!40, coltitle=success, #1}
+
+\newtcolorbox{warningbox}[1][]{basebox,
+  colback=warninglight, colframe=warning!40, coltitle=warning, #1}
+
+\newtcolorbox{purplebox}[1][]{basebox,
+  colback=purplelight, colframe=purple!40, coltitle=purple, #1}
+
+\newtcolorbox{dangerbox}[1][]{basebox,
+  colback=dangerlight, colframe=danger!40, coltitle=danger, #1}
+
+\newtcolorbox{tealbox}[1][]{basebox,
+  colback=teallight, colframe=tealcolor!40, coltitle=tealcolor, #1}
+
+\newtcolorbox{graybox}[1][]{basebox,
+  colback=graylight, colframe=graydark!30, coltitle=graydark, #1}
+
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+% ============================================================
+\begin{document}
+
+% PORTADA
+\begin{titlepage}
+  \centering
+  \vspace*{2cm}
+
+  {\color{graydark}\small\MakeUppercase{Trabajo de Graduacion --- Plan de Proyecto}}
+
+  \vspace{1cm}
+  {\color{primary}\rule{12cm}{1.5pt}}
+  \vspace{0.6cm}
+
+  {\Large\bfseries\color{textprimary}
+    Sistema de auditoria automatizada de APIs REST\\[6pt]
+    en Django REST Framework para la deteccion\\[6pt]
+    y reporte de vulnerabilidades OWASP API Top 10\\[6pt]
+    mediante analisis hibrido y generacion aumentada\\[6pt]
+    por recuperacion con modelos de lenguaje local
+  }
+
+  \vspace{0.6cm}
+  {\color{primary}\rule{12cm}{1.5pt}}
+  \vspace{2cm}
+
+  \begin{tabular}{ll}
+    \color{graydark}Framework objetivo:      & \textbf{Django REST Framework (Python)} \\[4pt]
+    \color{graydark}Referencia de seguridad: & \textbf{OWASP API Top 10 (2023)} \\[4pt]
+    \color{graydark}Modelo de lenguaje:      & \textbf{LLM local via Ollama (Llama 3 / Mistral 7B)} \\[4pt]
+    \color{graydark}Recuperacion de contexto:& \textbf{RAG con ChromaDB + Sentence-Transformers} \\[4pt]
+  \end{tabular}
+
+  \vfill
+  {\color{graydark}\small\today}
+\end{titlepage}
+
+% INDICE
+\tableofcontents
+\newpage
+
+% ============================================================
+% SECCION 1: RESUMEN
+% ============================================================
+\section{Resumen del Proyecto}
+
+\subsection{Descripcion general}
+
+\begin{infobox}
+El proyecto consiste en desarrollar una herramienta de linea de comandos que recibe un proyecto de API construido con \textbf{Django REST Framework} y lo analiza de dos formas complementarias: revisando su codigo fuente (analisis estatico) y enviandole peticiones HTTP reales (analisis dinamico). Los hallazgos son procesados por un modulo de \textbf{Generacion Aumentada por Recuperacion (RAG)}: antes de generar cada explicacion, el sistema busca en una base de datos vectorial local los fragmentos mas relevantes de documentacion OWASP, CVEs reales de Django y guias de seguridad de DRF, y los entrega como contexto al modelo de lenguaje local (Ollama). El resultado es un reporte con descripciones fundamentadas en fuentes verificables y recomendaciones especificas para el ecosistema Django --- todo ejecutado localmente, sin internet ni costos externos.
+\end{infobox}
+
+\subsection{Originalidad y justificacion}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{XX}
+\toprule
+\textbf{Lo que ya existe} & \textbf{El aporte de este proyecto} \\
+\midrule
+OWASP ZAP, 42Crunch y Spectral son herramientas de analisis genericas. No comprenden los patrones propios de Django: serializers, viewsets, permisos de DRF ni configuraciones de \texttt{settings.py}. Ademas, sus reportes no citan fuentes especificas para cada hallazgo. &
+Reglas de deteccion especificas para DRF combinadas con RAG: cada hallazgo se enriquece con los fragmentos mas relevantes de OWASP y documentacion de Django recuperados dinamicamente, produciendo recomendaciones trazables a fuentes reales. Todo opera de forma local sin servicios externos. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection{Alcance de vulnerabilidades cubiertas}
+
+El proyecto se limita a las diez categorias de la lista \textbf{OWASP API Security Top 10 (2023)}, con cobertura profunda de las primeras cinco:
+
+\begin{itemize}[leftmargin=1.5em, itemsep=4pt]
+  \item \textbf{API1} --- Broken Object Level Authorization (BOLA)
+  \item \textbf{API2} --- Broken Authentication
+  \item \textbf{API3} --- Broken Object Property Level Authorization
+  \item \textbf{API4} --- Unrestricted Resource Consumption
+  \item \textbf{API5} --- Broken Function Level Authorization
+  \item \textcolor{graydark}{API6--API10 --- cobertura parcial; reportadas como hallazgos potenciales}
+\end{itemize}
+
+% ============================================================
+% SECCION 2: FASES
+% ============================================================
+\newpage
+\section{Fases del Proyecto}
+
+\begin{infobox}[title={Fase 1 --- Marco teorico y diseno de la herramienta}]
+Documentar como se manifiestan las vulnerabilidades OWASP API Top 10 en proyectos Django REST Framework, identificando que patrones de codigo son senales de cada una. Disenar la arquitectura completa del sistema: modulos, flujo RAG, base vectorial y formato del reporte.
+
+\smallskip
+\textbf{Entregables:} documento de diseno, diagrama de arquitectura con flujo RAG, inventario de patrones inseguros en DRF.
+\end{infobox}
+
+\begin{successbox}[title={Fase 2 --- API Django vulnerable de prueba}]
+Construir una API en Django REST Framework con vulnerabilidades conocidas e \textit{intencionales}: endpoints sin autenticacion, serializers que exponen campos sensibles, ausencia de throttling, parametros de ruta susceptibles a BOLA, entre otros. Esta API funcionara como laboratorio de validacion y como caso de estudio en el documento de tesis.
+
+\smallskip
+\textbf{Entregables:} repositorio con la API vulnerable, documentacion de cada vulnerabilidad incluida.
+\end{successbox}
+
+\begin{successbox}[title={Fase 3 --- Modulo de analisis estatico}]
+Script en Python que lee el codigo fuente del proyecto Django y detecta configuraciones inseguras mediante el modulo \texttt{ast} (arbol de sintaxis abstracta):
+
+\begin{itemize}[leftmargin=1.5em, itemsep=2pt]
+  \item Serializers sin campos \texttt{read\_only} en datos sensibles
+  \item Endpoints sin clase de permiso (\texttt{IsAuthenticated}, etc.)
+  \item \texttt{settings.py} con \texttt{DEBUG=True} o sin JWT configurado
+  \item Views sin throttling definido
+  \item Rutas con parametros numericos directos (riesgo BOLA / API1)
+\end{itemize}
+
+\smallskip
+\textbf{Entregables:} modulo \texttt{static\_analyzer.py} con pruebas unitarias.
+\end{successbox}
+
+\begin{warningbox}[title={Fase 4 --- Modulo de analisis dinamico}]
+Script que envia peticiones HTTP reales a la API en ejecucion y evalua las respuestas para detectar comportamientos inseguros:
+
+\begin{itemize}[leftmargin=1.5em, itemsep=2pt]
+  \item Peticion sin token de autenticacion --- devuelve 401 o datos reales?
+  \item Cambio del ID en la URL --- devuelve datos de otro usuario? (BOLA)
+  \item Envio de campos extra en el body --- son aceptados? (mass assignment)
+  \item Requests masivos al mismo endpoint --- existe rate limiting?
+  \item Metodos HTTP no declarados (\texttt{DELETE}, \texttt{PATCH}) --- estan bloqueados?
+\end{itemize}
+
+\smallskip
+\textbf{Entregables:} modulo \texttt{dynamic\_analyzer.py} con suite de pruebas de seguridad.
+\end{warningbox}
+
+\begin{tealbox}[title={Fase 5 --- Base de conocimiento RAG}]
+Construccion de la base de datos vectorial que el sistema consultara para enriquecer cada hallazgo con contexto relevante antes de pasarlo al modelo de lenguaje:
+
+\begin{itemize}[leftmargin=1.5em, itemsep=2pt]
+  \item Carga de documentos fuente: OWASP API Top 10 (PDF), documentacion de Django REST Framework, CVEs reales relacionados a Django, guias de seguridad de Python
+  \item Division en fragmentos (chunks) de 300--500 tokens con solapamiento de 50 tokens
+  \item Conversion a vectores numericos usando \texttt{sentence-transformers} (modelo \texttt{all-MiniLM-L6-v2}, corre en CPU)
+  \item Almacenamiento en \textbf{ChromaDB} (base vectorial local, sin servidor)
+  \item Implementacion de la busqueda por similitud: dado un hallazgo, recuperar los 4--5 chunks mas relevantes
+\end{itemize}
+
+\smallskip
+\textbf{Entregables:} modulo \texttt{rag\_retriever.py}, base vectorial indexada, script de indexacion de documentos.
+\end{tealbox}
+
+\begin{purplebox}[title={Fase 6 --- Modulo LLM con RAG integrado}]
+Integracion del sistema de recuperacion con el modelo de lenguaje local. El flujo completo por cada hallazgo es:
+
+\begin{enumerate}[leftmargin=1.5em, itemsep=2pt]
+  \item El hallazgo estructurado se convierte en una consulta vectorial
+  \item ChromaDB devuelve los 4--5 fragmentos mas similares de la base de conocimiento
+  \item Se construye un prompt enriquecido: contexto recuperado + hallazgo + instruccion de correccion
+  \item Ollama (Llama 3 o Mistral 7B) genera la descripcion, severidad y recomendacion de codigo Django
+\end{enumerate}
+
+Las respuestas son trazables: cada recomendacion cita el fragmento de OWASP o documentacion que la respalda.
+
+\smallskip
+\textbf{Entregables:} modulo \texttt{llm\_interpreter.py} con RAG, evaluacion comparativa con y sin RAG.
+\end{purplebox}
+
+\begin{dangerbox}[title={Fase 7 --- Generacion del reporte y validacion}]
+El sistema produce un reporte en formato \textbf{HTML/PDF} que incluye: resumen ejecutivo, tabla consolidada de vulnerabilidades, y por cada hallazgo: descripcion, evidencia, severidad, recomendacion de codigo y fuentes citadas. Se valida contra la API vulnerable de la Fase 2 midiendo todas las metricas de evaluacion.
+
+\smallskip
+\textbf{Entregables:} modulo generador de reportes, reporte de muestra con citas RAG, analisis comparativo con/sin RAG.
+\end{dangerbox}
+
+% ============================================================
+% SECCION 3: STACK TECNICO
+% ============================================================
+\newpage
+\section{Stack Tecnico}
+
+\subsection{Tecnologias y herramientas}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{>{\bfseries}lL}
+\toprule
+\textbf{Tecnologia} & \textbf{Rol en el proyecto} \\
+\midrule
+Python 3.11+ & Lenguaje principal de toda la herramienta \\
+Ollama & Motor para ejecutar el LLM completamente local \\
+Llama 3 / Mistral 7B & Modelo de lenguaje (acepta contexto RAG en el prompt) \\
+ChromaDB & Base de datos vectorial local; almacena los chunks indexados \\
+Sentence-Transformers & Convierte texto a vectores; modelo \texttt{all-MiniLM-L6-v2} en CPU \\
+LlamaIndex & Orquestador RAG: carga documentos, divide en chunks, gestiona busquedas \\
+Django REST Framework & Framework objetivo del analisis (version 3.14+) \\
+\texttt{ast} (modulo estandar) & Parseo del arbol de sintaxis para analisis estatico \\
+Requests / HTTPX & Envio de peticiones HTTP para analisis dinamico \\
+ReportLab / WeasyPrint & Generacion del reporte final en formato PDF \\
+Pytest & Pruebas unitarias de los modulos de deteccion \\
+OWASP API Top 10 (2023) & Documento base de la base de conocimiento RAG \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection{Arquitectura del sistema con flujo RAG}
+
+\begin{graybox}
+\begin{center}
+\renewcommand{\arraystretch}{1.6}
+\begin{tabular}{cl}
+\textbf{Entrada}   & Ruta al proyecto Django + URL base de la API en ejecucion \\
+$\downarrow$       & \\
+\textbf{Modulo 1}  & Analizador estatico: lee archivos \texttt{.py}, detecta patrones inseguros \\
+\textbf{Modulo 2}  & Analizador dinamico: envia peticiones, evalua respuestas HTTP \\
+$\downarrow$       & Hallazgos estructurados \\
+\textbf{Modulo 3a} & RAG Retriever: convierte hallazgo a vector, busca en ChromaDB \\
+                   & $\rightarrow$ recupera chunks relevantes de OWASP + docs DRF \\
+\textbf{Modulo 3b} & LLM (Ollama): recibe hallazgo + contexto RAG, genera descripcion \\
+                   & $\rightarrow$ severidad + recomendacion de codigo + fuentes citadas \\
+$\downarrow$       & \\
+\textbf{Salida}    & Reporte HTML/PDF con vulnerabilidades trazables a fuentes OWASP \\
+\end{tabular}
+\end{center}
+\end{graybox}
+
+\subsection{Requisitos minimos de hardware}
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Componente} & \textbf{Requisito} \\
+\midrule
+RAM & 8 GB (Mistral 7B + ChromaDB operan en paralelo sin problema) \\
+Almacenamiento & $\sim$6 GB (5 GB modelo + 1 GB base vectorial y documentos) \\
+GPU & Opcional --- RTX 3070 Ti acelera Ollama significativamente \\
+CPU & Apple M3 o Ryzen 5 3600X son suficientes para sentence-transformers \\
+Conexion a internet & Solo instalacion inicial; ejecucion 100\% local y offline \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ============================================================
+% SECCION 5: ENTREGABLES
+% ============================================================
+\newpage
+\section{Entregables y Metricas de Evaluacion}
+
+\subsection{Entregables del proyecto}
+
+\begin{enumerate}[leftmargin=1.5em, itemsep=10pt]
+
+  \item \textbf{Documento de tesis completo}\\
+  Marco teorico (OWASP, DRF, RAG, bases vectoriales), diseno del sistema, implementacion, analisis de resultados, conclusiones y bibliografia.
+
+  \item \textbf{API Django vulnerable (laboratorio)}\\
+  Proyecto Django REST Framework con vulnerabilidades intencionales y documentadas. Sirve como caso de prueba reproducible y como ejemplo ilustrativo dentro de la tesis.
+
+  \item \textbf{Base de conocimiento RAG indexada}\\
+  Conjunto de documentos procesados (OWASP PDF, docs DRF, CVEs) almacenados en ChromaDB, listos para consulta vectorial. Incluye script de re-indexacion.
+
+  \item \textbf{Herramienta de auditoria completa}\\
+  Aplicacion de linea de comandos en Python con todos los modulos integrados: analizador estatico, analizador dinamico, RAG retriever e interprete LLM. Incluye codigo fuente, pruebas unitarias y manual de instalacion.
+
+  \item \textbf{Reporte de muestra con citas RAG}\\
+  Un reporte real generado por el sistema sobre la API vulnerable, donde cada recomendacion cita el fragmento de OWASP o documentacion que la respalda. Se incluye como anexo en la tesis.
+
+  \item \textbf{Evaluacion comparativa RAG vs. sin RAG}\\
+  Experimento que mide la diferencia en calidad de los reportes generados con y sin recuperacion de contexto. Este experimento constituye un resultado academico propio y original del trabajo.
+
+\end{enumerate}
+
+\subsection{Metricas para la defensa}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{>{\bfseries}lL}
+\toprule
+\textbf{Metrica} & \textbf{Descripcion} \\
+\midrule
+Tasa de deteccion &
+Porcentaje de vulnerabilidades conocidas que la herramienta detecto correctamente sobre la API vulnerable. \\[4pt]
+Falsos positivos &
+Cantidad de hallazgos reportados que no corresponden a vulnerabilidades reales. \\[4pt]
+Tiempo de ejecucion &
+Tiempo total del sistema en analizar un proyecto Django de tamano mediano, incluyendo la fase RAG. \\[4pt]
+Calidad con RAG vs. sin RAG &
+Comparacion cualitativa y cuantitativa de las recomendaciones generadas con y sin recuperacion de contexto vectorial. Metrica original del trabajo. \\[4pt]
+Trazabilidad de fuentes &
+Porcentaje de recomendaciones en el reporte que citan correctamente un fragmento de OWASP o documentacion DRF. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\vspace{0.6cm}
+
+\begin{infobox}[title={Argumento de originalidad para la defensa}]
+Las herramientas existentes (OWASP ZAP, 42Crunch, Spectral) realizan analisis genericos sin conocimiento del framework. Este proyecto aporta tres elementos diferenciadores: \textbf{(1)} reglas de deteccion especificas para los patrones de codigo de Django REST Framework; \textbf{(2)} un sistema RAG que enriquece cada hallazgo con contexto recuperado dinamicamente de OWASP y documentacion DRF, produciendo recomendaciones trazables a fuentes verificables; y \textbf{(3)} operacion completamente local y offline, sin costos de API externas, accesible para equipos sin presupuesto para herramientas comerciales. La evaluacion comparativa con/sin RAG constituye un experimento original con resultados medibles.
+\end{infobox}
+
+\end{document}

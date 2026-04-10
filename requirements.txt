@@ -1,0 +1,26 @@
+# Django REST API (vulnerable lab)
+django==4.2.*
+djangorestframework==3.14.*
+djangorestframework-simplejwt==5.3.*
+
+# Static & dynamic analysis
+requests==2.31.*
+httpx==0.27.*
+
+# RAG pipeline
+chromadb==0.5.*
+llama-index-core==0.10.*
+llama-index-llms-ollama==0.2.*
+llama-index-embeddings-huggingface==0.2.*
+sentence-transformers==3.0.*
+
+# Report generation
+reportlab==4.2.*
+weasyprint==62.*
+
+# CLI
+click==8.1.*
+
+# Testing
+pytest==8.2.*
+pytest-django==4.8.*
