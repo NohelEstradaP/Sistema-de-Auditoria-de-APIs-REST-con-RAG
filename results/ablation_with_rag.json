@@ -1,0 +1,62 @@
+{
+  "API8-DEBUG-ENABLED": {
+    "text": "Recommendation:\n\n1. This vulnerability is dangerous because when `DEBUG = True`, it exposes sensitive information such as full stack traces, local variables, SQL queries, internal URLs, and settings to any user who triggers an error. This can potentially lead to unauthorized access, data exposure, and other security risks.\n\n2. To fix this issue in Django REST Framework, set `DEBUG = False` in your `config/settings.py`. Also, ensure that `ALLOWED_HOSTS` is explicitly defined and never includes `['*']`.\n\n3. This vulnerability maps to the OWASP API Security category \"API8 - Debug mode enabled\".\n\nSources:\n- drf_security_guide.md\n- owasp_api_top10_2023.md",
+    "chars": 658,
+    "seconds": 18.3,
+    "sources": [
+      "drf_security_guide.md — DEBUG = True Risks",
+      "owasp_api_top10_2023.md — Attack Scenarios",
+      "drf_security_guide.md — Critical Settings for Production",
+      "owasp_api_top10_2023.md — How to Prevent"
+    ],
+    "chunks": 4
+  },
+  "API2-NO-PERMISSION": {
+    "text": "This vulnerability is dangerous because it allows unauthenticated users to access data that should be restricted, potentially leading to unauthorized access or data breaches. To fix this issue in Django REST Framework, you should explicitly declare `permission_classes` for each view, such as `permission_classes = [IsAuthenticated]`. This ensures that only authenticated users can access the view's data.\n\nThe specific code fix would be to modify the UserListView in core/views.py:\n\n```python\nfrom rest_framework import permissions\nfrom rest_framework.generics import ListAPIView\n\nclass UserListView(ListAPIView):\n    permission_classes = [permissions.IsAuthenticated]\n    # ... other view code\n```\n\nThis vulnerability maps to the OWASP API Security category: API2 - Lack of Resources Protection (Insecure Direct Object References).\n\nSources:\n1. owasp_api_top10_2023.md\n2. drf_security_guide.md",
+    "chars": 895,
+    "seconds": 21.1,
+    "sources": [
+      "owasp_api_top10_2023.md — Django REST Framework Mitigation",
+      "drf_security_guide.md — JWT Authentication (recommended)",
+      "drf_security_guide.md — Per-View Override",
+      "owasp_api_top10_2023.md — API3:2023 — Broken Object Property Level Authorization"
+    ],
+    "chunks": 4
+  },
+  "API3-SENSITIVE-FIELD": {
+    "text": "This vulnerability is dangerous because it exposes sensitive user passwords in the API response, which can lead to unauthorized access or account takeover attacks. To mitigate this issue, you should mark the `password` field as `write_only=True` in your Django REST Framework serializer to ensure that it's accepted on input but never included in the response.\n\nHere is a specific code fix for Django REST Framework:\n\n```python\nclass UserSerializer(serializers.ModelSerializer):\n    class Meta:\n        model = User\n        fields = ['id', 'username', 'email']\n        extra_kwargs = {\n            'password': {'write_only': True},\n            'is_admin': {'read_only': True},\n            'is_staff': {'read_only': True},\n        }\n```\n\nThis vulnerability maps to the OWASP API Security category \"Broken Object Level Authorization\" (API3).\n\nSources:\n- drf_security_guide.md — write_only Fields, read_only Fields\n- owasp_api_top10_2023.md — Django REST Framework Mitigation, How to Prevent",
+    "chars": 988,
+    "seconds": 23.1,
+    "sources": [
+      "drf_security_guide.md — write_only Fields",
+      "drf_security_guide.md — read_only Fields",
+      "owasp_api_top10_2023.md — Django REST Framework Mitigation",
+      "owasp_api_top10_2023.md — How to Prevent"
+    ],
+    "chunks": 4
+  },
+  "API1-BOLA": {
+    "text": "Recommendation:\n\n1. This vulnerability, known as Broken Object Level Authorization (BOLA), is dangerous because it allows unauthorized users to access sensitive data that belongs to other users. In this case, user bob was able to retrieve order 1, which belongs to user alice, demonstrating a lack of proper authorization checks.\n\n2. To fix this issue in Django REST Framework, you should implement permission classes that check if the authenticated user has ownership or appropriate permissions for the object being accessed. For example, you can use the `django-rest-framework-guardian` package to manage object-level permissions.\n\n3. This vulnerability maps to the OWASP API Security category of Broken Object Level Authorization (API1:2023).\n\nSources:\n- owasp_api_top10_2023.md — API1:2023 — Broken Object Level Authorization (BOLA)\n- owasp_api_top10_2023.md — Attack Scenario\n- owasp_api_top10_2023.md — API5:2023 — Broken Function Level Authorization",
+    "chars": 956,
+    "seconds": 21.4,
+    "sources": [
+      "owasp_api_top10_2023.md — API1:2023 — Broken Object Level Authorization (BOLA)",
+      "owasp_api_top10_2023.md — API3:2023 — Broken Object Property Level Authorization",
+      "owasp_api_top10_2023.md — Attack Scenario",
+      "owasp_api_top10_2023.md — API5:2023 — Broken Function Level Authorization"
+    ],
+    "chunks": 4
+  },
+  "API4-NO-THROTTLING": {
+    "text": "This vulnerability is dangerous because without rate limiting, an attacker can repeatedly flood your API with requests, potentially causing denial-of-service (DoS) attacks or excessive resource consumption.\n\nTo fix this issue in Django REST Framework, you should configure rate limiting by adding `DEFAULT_THROTTLE_CLASSES` and `DEFAULT_THROTTLE_RATES` to your `config/settings.py`. Here's an example:\n\n```python\nREST_FRAMEWORK = {\n    'DEFAULT_THROTTLE_CLASSES': [\n        'rest_framework.throttling.AnonRateThrottle',\n        'rest_framework.throttling.UserRateThrottle',\n    ],\n    'DEFAULT_THROTTLE_RATES': {\n        'anon': '100/day',\n        'user': '1000/day',\n    },\n}\n```\n\nThis code sets up a basic rate limiting for both anonymous and authenticated users. For stricter per-view throttling, you can define `throttle_classes` on individual views as well.\n\nThe OWASP API Security category this vulnerability maps to is API4: Insecure (or Lacking) Authentication & Authorization.\n\nSources:\n1. drf_security_guide.md — Global Configuration\n2. owasp_api_top10_2023.md — Django REST Framework Mitigation\n3. drf_security_guide.md — Per-View Throttling\n4. owasp_api_top10_2023.md — How to Prevent",
+    "chars": 1196,
+    "seconds": 35.2,
+    "sources": [
+      "drf_security_guide.md — Global Configuration",
+      "owasp_api_top10_2023.md — Django REST Framework Mitigation",
+      "drf_security_guide.md — Per-View Throttling",
+      "owasp_api_top10_2023.md — How to Prevent"
+    ],
+    "chunks": 4
+  }
+}

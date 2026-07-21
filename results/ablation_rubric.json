@@ -1,0 +1,124 @@
+{
+  "rubric": {
+    "scale": "1=Poor, 2=Adequate, 3=Good",
+    "criteria": {
+      "TC": "Technical Correctness \u2014 code fix is syntactically correct and addresses the vulnerability",
+      "DS": "DRF Specificity \u2014 uses DRF-native APIs, not generic Django or incorrect third-party packages",
+      "OA": "OWASP Alignment \u2014 correctly names and describes the OWASP API Security category",
+      "AC": "Actionability \u2014 developer can implement without additional research",
+      "ST": "Source Traceability \u2014 cites verifiable documentation from the knowledge base"
+    },
+    "evaluator": "first author",
+    "note": "Scores represent independent assessment of each recommendation against criteria above"
+  },
+  "with_rag": {
+    "API8-DEBUG-ENABLED": {
+      "TC": 3,
+      "DS": 3,
+      "OA": 3,
+      "AC": 3,
+      "ST": 3,
+      "avg": 3.0,
+      "notes": "Correct fix (DEBUG=False + ALLOWED_HOSTS); names API8; cites drf_security_guide + owasp docs"
+    },
+    "API2-NO-PERMISSION": {
+      "TC": 3,
+      "DS": 3,
+      "OA": 2,
+      "AC": 3,
+      "ST": 3,
+      "avg": 2.8,
+      "notes": "Correct IsAuthenticated pattern; OWASP description inaccurate ('Lack of Resources Protection'); real KB citations"
+    },
+    "API3-SENSITIVE-FIELD": {
+      "TC": 3,
+      "DS": 3,
+      "OA": 2,
+      "AC": 3,
+      "ST": 3,
+      "avg": 2.8,
+      "notes": "Idiomatic extra_kwargs pattern; OWASP name slightly off ('Broken Object Level Auth' vs correct 'Broken Object Property Level Auth'); cites write_only/read_only sections"
+    },
+    "API1-BOLA": {
+      "TC": 3,
+      "DS": 2,
+      "OA": 3,
+      "AC": 2,
+      "ST": 3,
+      "avg": 2.6,
+      "notes": "Mentions django-rest-framework-guardian (valid extension, not DRF-native); correct OWASP API1 naming; multiple approaches reduce actionability"
+    },
+    "API4-NO-THROTTLING": {
+      "TC": 3,
+      "DS": 3,
+      "OA": 2,
+      "AC": 3,
+      "ST": 3,
+      "avg": 2.8,
+      "notes": "Correct rest_framework.throttling built-in config; OWASP description wrong ('Insecure Authentication' vs correct 'Unrestricted Resource Consumption'); cites per-view throttling doc"
+    },
+    "overall_avg": {
+      "TC": 3.0,
+      "DS": 2.8,
+      "OA": 2.4,
+      "AC": 2.8,
+      "ST": 3.0,
+      "avg": 2.8
+    }
+  },
+  "no_rag": {
+    "API8-DEBUG-ENABLED": {
+      "TC": 3,
+      "DS": 2,
+      "OA": 2,
+      "AC": 2,
+      "ST": 1,
+      "avg": 2.0,
+      "notes": "Correct fix but suggests Sentry (off-topic); no OWASP label; sources explicitly 'none'"
+    },
+    "API2-NO-PERMISSION": {
+      "TC": 3,
+      "DS": 3,
+      "OA": 2,
+      "AC": 2,
+      "ST": 2,
+      "avg": 2.4,
+      "notes": "Correct code; fabricated DRF documentation URLs (hallucination); no OWASP label \u2014 ST=2 (cites real DRF docs URLs from training data, not KB retrieval)"
+    },
+    "API3-SENSITIVE-FIELD": {
+      "TC": 3,
+      "DS": 2,
+      "OA": 2,
+      "AC": 2,
+      "ST": 1,
+      "avg": 2.0,
+      "notes": "Correct but less idiomatic (CharField vs extra_kwargs); no OWASP label; sources 'none'"
+    },
+    "API1-BOLA": {
+      "TC": 1,
+      "DS": 2,
+      "OA": 2,
+      "AC": 1,
+      "ST": 1,
+      "avg": 1.4,
+      "notes": "Response truncated mid-sentence; incomplete \u2014 cannot be fully implemented; no sources"
+    },
+    "API4-NO-THROTTLING": {
+      "TC": 1,
+      "DS": 1,
+      "OA": 1,
+      "AC": 1,
+      "ST": 2,
+      "avg": 1.2,
+      "notes": "Recommends django-ratelimit (wrong package; DRF has built-in throttling); wrong OWASP name; misleading recommendation \u2014 ST=2 (cites real GitHub/DRF URLs from training data, not KB retrieval)"
+    },
+    "overall_avg": {
+      "TC": 2.2,
+      "DS": 2.0,
+      "OA": 1.8,
+      "AC": 1.6,
+      "ST": 1.4,
+      "avg": 1.8
+    }
+  }
+}

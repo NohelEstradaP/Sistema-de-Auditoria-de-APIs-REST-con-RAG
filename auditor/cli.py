@@ -7,6 +7,7 @@ from .dynamic_analyzer import run_dynamic_analysis
 from .dynamic_analyzer.findings import DynamicFinding
 from .rag.indexer import index_knowledge_base
 from .rag.generator import enrich_findings, DEFAULT_MODEL
+from .report import build_report, export
 from .config import DEFAULT_KB_DIR, DEFAULT_CHROMA_DIR
 
 _SEVERITY_COLOR = {
@@ -80,8 +81,10 @@ def cli():
               help="Modelo Ollama a usar para las recomendaciones RAG.")
 @click.option("--chroma-dir", default=DEFAULT_CHROMA_DIR, show_default=True,
               help="Directorio ChromaDB con la knowledge base indexada.")
+@click.option("--output", "output_path", default=None, metavar="FILE",
+              help="Exportar reporte a FILE (.html o .pdf).")
 def scan(project_path: str, static: bool, dynamic_url: str,
-         rag: bool, model: str, chroma_dir: str):
+         rag: bool, model: str, chroma_dir: str, output_path: str):
     """Audita PROJECT_PATH en busca de vulnerabilidades OWASP API Top 10."""
     path = Path(project_path).resolve()
     click.echo(f"Auditando: {path}")
@@ -102,6 +105,7 @@ def scan(project_path: str, static: bool, dynamic_url: str,
 
     _print_findings(all_findings)
 
+    recs = []
     if rag and all_findings:
         click.echo(f"\n→ Generando recomendaciones con RAG ({model})...")
         try:
@@ -110,6 +114,15 @@ def scan(project_path: str, static: bool, dynamic_url: str,
             _print_recommendations(recs)
         except Exception as exc:
             click.secho(f"  Advertencia RAG: {exc}", fg="yellow")
+
+    if output_path:
+        click.echo(f"\n→ Exportando reporte a {output_path} ...")
+        try:
+            report = build_report(str(path), all_findings, recs)
+            saved = export(report, output_path)
+            click.secho(f"  Reporte guardado: {saved}", fg="green")
+        except Exception as exc:
+            click.secho(f"  Error al exportar: {exc}", fg="red", err=True)
 
     high_count = sum(1 for f in all_findings if f.severity == "HIGH")
     sys.exit(1 if high_count > 0 else 0)

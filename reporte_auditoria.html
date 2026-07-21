@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reporte de Auditoría DRF</title>
+  <style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px;
+       color: #2d3748; background: #f7fafc; }
+.page { max-width: 960px; margin: 0 auto; padding: 32px 24px; }
+
+/* Header */
+.header { background: #1a202c; color: white; padding: 28px 32px;
+          border-radius: 8px; margin-bottom: 28px; }
+.header h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+.header .meta { font-size: 12px; color: #a0aec0; }
+
+/* Summary cards */
+.summary { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; }
+.card { flex: 1; min-width: 120px; background: white; border-radius: 8px;
+        padding: 16px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+.card .num { font-size: 32px; font-weight: 700; line-height: 1; }
+.card .lbl { font-size: 11px; color: #718096; margin-top: 4px; text-transform: uppercase; }
+.card.high   .num { color: #e53e3e; }
+.card.medium .num { color: #dd6b20; }
+.card.low    .num { color: #3182ce; }
+.card.info   .num { color: #718096; }
+.card.total  .num { color: #1a202c; }
+
+/* Section titles */
+h2 { font-size: 16px; font-weight: 700; color: #1a202c;
+     border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin: 28px 0 16px; }
+h3 { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+
+/* Finding cards */
+.finding { background: white; border-radius: 8px; margin-bottom: 14px;
+           box-shadow: 0 1px 3px rgba(0,0,0,.08); overflow: hidden; }
+.finding-header { display: flex; align-items: center; gap: 10px;
+                  padding: 12px 16px; border-left: 5px solid; }
+.badge { font-size: 11px; font-weight: 700; padding: 2px 8px;
+         border-radius: 4px; color: white; white-space: nowrap; }
+.finding-title { font-weight: 600; font-size: 13px; flex: 1; }
+.owasp-tag { font-size: 11px; color: #718096; background: #edf2f7;
+             padding: 2px 7px; border-radius: 4px; white-space: nowrap; }
+.finding-body { padding: 12px 16px; border-top: 1px solid #f0f0f0; }
+.finding-body dl { display: grid; grid-template-columns: 100px 1fr; gap: 4px 12px; }
+.finding-body dt { color: #718096; font-size: 12px; }
+.finding-body dd { font-size: 12px; }
+.evidence { font-family: monospace; font-size: 11px; background: #f7fafc;
+            border: 1px solid #e2e8f0; border-radius: 4px;
+            padding: 6px 10px; margin-top: 6px; word-break: break-all; }
+
+/* Recommendations */
+.rec { background: white; border-radius: 8px; margin-bottom: 14px;
+       box-shadow: 0 1px 3px rgba(0,0,0,.08); padding: 16px; }
+.rec-rule { font-size: 11px; font-weight: 700; color: #3182ce;
+            background: #ebf8ff; padding: 2px 8px; border-radius: 4px;
+            display: inline-block; margin-bottom: 10px; }
+.rec-text { line-height: 1.6; white-space: pre-wrap; font-size: 12px; }
+.rec-sources { margin-top: 10px; font-size: 11px; color: #718096;
+               border-top: 1px solid #f0f0f0; padding-top: 8px; }
+
+/* Coverage */
+.owasp-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.owasp-chip { background: #1a202c; color: white; font-size: 11px; font-weight: 600;
+              padding: 4px 12px; border-radius: 20px; }
+
+/* Footer */
+.footer { margin-top: 40px; text-align: center; font-size: 11px; color: #a0aec0; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <h1>Reporte de Auditoría de Seguridad</h1>
+    <div class="meta">
+      Proyecto: ./vulnerable_api &nbsp;&bull;&nbsp;
+      Generado: 2026-07-01 15:55:32
+    </div>
+  </div>
+
+  
+<div class="summary">
+  <div class="card total"><div class="num">25</div><div class="lbl">Total</div></div>
+  <div class="card high"><div class="num">20</div><div class="lbl">High</div></div>
+  <div class="card medium"><div class="num">4</div><div class="lbl">Medium</div></div>
+  <div class="card low"><div class="num">1</div><div class="lbl">Low</div></div>
+  <div class="card info"><div class="num">0</div><div class="lbl">Info</div></div>
+</div>
+
+  <h2>Hallazgos (25)</h2>
+  
+<div class="finding">
+  <div class="finding-header" style="border-left-color:#e53e3e; background:#fff5f5;">
+    <span class="badge" style="background:#e53e3e;">HIGH</span>
+    <span class="finding-title">Posible BOLA en ruta &#x27;users/&lt;int:pk&gt;/&#x27;</span>
+    <span class="owasp-tag">API1</span>
+  </div>
+  <div class="finding-body">
+    <dl>
+      <dt>Regla</dt><dd>API1-BOLA-URL</dd>
+      <dt>Archivo</dt><dd>/Users/nohelestradap/Documents/tesis_proyecto/vulnerable_api/core/urls.py:12</dd>
+      <dt>Descripción</dt><dd>La ruta &#x27;users/&lt;int:pk&gt;/&#x27; acepta un identificador numérico. Si la vista correspondiente no verifica que el objeto solicitado pertenece al usuario autenticado, cualquier usuario puede acceder a datos ajenos cambiando el parámetro (BOLA/IDOR).</dd>
+    </dl>
+    <div class="evidence">path(&#x27;users/&lt;int:pk&gt;/&#x27;, views.UserDetailView.as_view(), name=&#x27;user-detail&#x27;),</div>
+  </div>
+</div>
+<div class="finding">
+  <div class="finding-header" style="border-left-color:#e53e3e; background:#fff5f5;">
+    <span class="badge" style="background:#e53e3e;">HIGH</span>
+    <span class="finding-title">Posible BOLA en ruta &#x27;products/&lt;int:pk&gt;/&#x27;</span>
+    <span class="owasp-tag">API1</span>
+  </div>
+  <div class="finding-body">
+    <dl>
+      <dt>Regla</dt><dd>API1-BOLA-URL</dd>
+      <dt>Archivo</dt><dd>/Users/nohelestradap/Documents/tesis_proyecto/vulnerable_api/core/urls.py:16</dd>
+      <dt>Descripción</dt><dd>La ruta &#x27;products/&lt;int:pk&gt;/&#x27; acepta un identificador numérico. Si la vista correspondiente no verifica que el objeto solicitado pertenece al usuario autenticado, cualquier usuario puede acceder a datos ajenos cambiando el parámetro (BOLA/IDOR).</dd>
+    </dl>
+    <div class="evidence">path(&#x27;products/&lt;int:pk&gt;/&#x27;, views.ProductDetailView.as_view(), name=&#x27;product-detail&#x27;),</div>
+  </div>
+</div>
+<div class="finding">
+  <div class="finding-header" style="border-left-color:#e53e3e; background:#fff5f5;">
+    <span class="badge" style="background:#e53e3e;">HIGH</span>
+    <span class="finding-title">Posible BOLA en ruta &#x27;orders/&lt;int:pk&gt;/&#x27;</span>
+    <span class="owasp-tag">API1</span>
+  </div>
+  <div class="finding-body">
+    <dl>
+      <dt>Regla</dt><dd>API1-BOLA-URL</dd>
+      <dt>Archivo</dt><dd>/Users/nohelestradap/Documents/tesis_proyecto/vulnerable_api/core/urls.py:20</dd>
+      <dt>Descripción</dt><dd>La ruta &#x27;orders/&lt;int:pk&gt;/&#x27; acepta un identificador numérico. Si la vista correspondiente no verifica que el objeto solicitado pertenece al usuario autenticado, cualquier usuario puede acceder a datos ajenos cambiando el parámetro (BOLA/IDOR).</dd>
+    </dl>
+    <div class="evidence">path(&#x27;orders/&lt;int:pk&gt;/&#x27;, views.OrderDetailView.as_view(), name=&#x27;order-detail&#x27;),</div>
+  </div>
+</div>
+<div class="finding">
+  <div class="finding-header" style="border-left-color:#e53e3e; background:#fff5f5;">
+    <span class="badge" style="background:#e53e3e;">HIGH</span>
+    <span class="finding-title">Posible BOLA en ruta &#x27;admin-panel/&lt;int:pk&gt;/&#x27;</span>
+    <span class="owasp-tag">API1</span>
+  </div>
+  <div class="finding-body">
+    <dl>
+      <dt>Regla</dt><dd>API1-BOLA-URL</dd>
+      <dt>Archivo</dt><dd>/Users/nohelestradap/Documents/tesis_proyecto/vulnerable_api/core/urls.py:24</dd>
+      <dt>Descripción</dt><dd>La ruta &#x27;admin-panel/&lt;int:pk&gt;/&#x27; acepta un identificador numérico. Si la vista correspondiente no verifica que el objeto solicitado pertenece al usuario autenticado, cualquier usuario puede acceder a datos ajenos cambiando el parámetro (BOLA/IDOR).</dd>
+    </dl>
+    <div class="evidence">path(&#x27;admin-panel/&lt;int:pk&gt;/&#x27;, views.AdminPanelView.as_view(), name=&#x27;admin-panel-delete&#x27;),</div>
+  </div>
+</div>
+<div class="finding">
+  <div class="finding-header" style="border-left-color:#e53e3e; background:#fff5f5;">
+    <span class="badge" style="background:#e53e3e;">HIGH</span>
+    <span class="finding-title">BOLA: acceso a objeto de otro usuario</span>
+    <span class="owasp-tag">API1</span>
+  </div>
+  <div class="finding-body">
+    <dl>
+      <dt>Regla</dt><dd>API1-BOLA</dd>
+      <dt>Endpoint</dt><dd>GET /api/orders/1/</dd>
+      <dt>Descripción</dt><dd>El usuario &#x27;bob&#x27; puede acceder a /api/orders/1/ que pertenece a &#x27;alice&#x27;. El servidor no verifica que el objeto solicitado pertenezca al usuario autenticado.</dd>
+    </dl>
+    <div class="evidence">HTTP 200 con token de bob. Body: {&quot;id&quot;:1,&quot;quantity&quot;:1,&quot;created_at&quot;:&quot;2026-04-06T22:39:45.739879Z&quot;,&quot;owner&quot;:1,&quot;product&quot;:1}</div>
+  </div>
+</div>
+<div class="finding">
+  <div class="finding-header" style="border-left-color:#e53e3e; background:#fff5f5;">
+    <span class="badge" style="background:#e53e3e;">HIGH</span>
+    <span class="finding-title">Vista &#x27;UserListView&#x27; sin permission_classes</span>
+    <span class="owasp-tag">API2</span>
+  </div>
+  <div class="finding-body">
+    <dl>
+      <dt>Regla</dt><dd>API2-NO-PERMISSION</dd>
+      <dt>Archivo</dt><dd>/Users/nohelestradap/Documents/tesis_proyecto/vulnerable_api/core/views.py:10</dd>
+      <dt>Descripción</dt><dd>La vista &#x27;UserListView&#x27; no define permission_classes. Si DEFAULT_PERMISSION_CLASSES no está configurado en settings, cualquier usuario anónimo puede acceder al endpoint.</dd>
+    </dl>
+    <div class="evidence">class UserListView(generics.ListCreateAPIView):</div>
+  </div>
+</div>
+<div class="finding">
+  <div class="finding-header" style="border-left-color:#e53e3e; background:#fff5f5;">
+    <span class="badge" style="background:#e53e3e;">HIGH</span>
+    <span class="finding-title">Vista &#x27;UserDetailView&#x27; sin permission_classes</span>
+    <span class="owasp-tag">API2</span>
+  </div>
+  <div class="finding-body">
+    <dl>
+      <dt>Regla</dt><dd>API2-NO-PERMISSION</dd>
+      <dt>Archivo</dt><dd>/Users/nohelestradap/Documents/tesis_proyecto/vulnerable_api/core/views.py:16</dd>
+      <dt>Descripción</dt><dd>La vista &#x27;UserDetailView&#x27; no define permission_classes. Si DEFAULT_PERMISSION_CLASSES no está configurado en settings, cualquier usuario anónimo puede acceder al endpoint.</dd>
+    </dl>
+    <div class="evidence">class UserDetailView(generics.RetrieveUpdateDestroyAPIView):</div>
+  </div>
+</div>
+<div class="finding">
+  <div class="finding-header" style="border-left-color:#e53e3e; background:#fff5f5;">
+    <span class="badge" style="background:#e53e3e;">HIGH</span>
+    <span class="finding-title">Vista &#x27;ProductListView&#x27; sin permission_classes</span>
+    <span class="owasp-tag">API2</span>
+  </div>
+  <div class="finding-body">
+    <dl>
+      <dt>Regla</dt><dd>API2-NO-PERMISSION</dd>
+      <dt>Archivo</dt><dd>/Users/nohelestradap/Documents/tesis_proyecto/vulnerable_api/core/views.py:21</dd>
+      <dt>Descripción</dt><dd>La vista &#x27;ProductListView&#x27; no define permission_classes. Si DEFAULT_PERMISSION_CLASSES no está configurado en settings, cualquier usuario anónimo puede acceder al endpoint.</dd>
+    </dl>
+    <div class="evidence">class ProductListView(generics.ListCreateAPIView):</div>
+  </div>
+</div>
+<div class="finding">
+  <div class="finding-header" style="border-left-color:#e53e3e; background:#fff5f5;">
+    <span class="badge" style="background:#e53e3e;">HIGH</span>
+    <span class="finding-title">Vista &#x27;ProductDetailView&#x27; sin permission_classes</span>
+    <span class="owasp-tag">API2</span>
+  </div>
+  <div class="finding-body">
+    <dl>
+      <dt>Regla</dt><dd>API2-NO-PERMISSION</dd>
+      <dt>Archivo</dt><dd>/Users/nohelestradap/Documents/tesis_proyecto/vulnerable_api/core/views.py:26</dd>
+      <dt>Descripción</dt><dd>La vista &#x27;ProductDetailView&#x27; no define permission_classes. Si DEFAULT_PERMISSION_CLASSES no está configurado en settings, cualquier usuario anónimo puede acceder al endpoint.</dd>
+    </dl>
+    <div class="evidence">class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):</div>
+  </div>
+</div>
+<div class="finding">
+  <div class="finding-header" style="border-left-color:#e53e3e; background:#fff5f5;">
+    <span class="badge" style="background:#e53e3e;">HIGH</span>
+    <span class="finding-title">Vista &#x27;OrderDetailView&#x27; sin permission_classes</span>
+    <span class="owasp-tag">API2</span>
+  </div>
+  <div class="finding-body">
+    <dl>
+      <dt>Regla</dt><dd>API2-NO-PERMISSION</dd>
+      <dt>Archivo</dt><dd>/Users/nohelestradap/Documents/tesis_proyecto/vulnerable_api/core/views.py:33</dd>
+      <dt>Descripción</dt><dd>La vista &#x27;OrderDetailView&#x27; no define permission_classes. Si DEFAULT_PERMISSION_CLASSES no está configurado en settings, cualquier usuario anónimo puede acceder al endpoint.</dd>
+    </dl>
+    <div class="evidence">class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):</div>
+  </div>
+</div>
+<div class="finding">
+  <div class="finding-header" style="border-left-color:#e53e3e; background:#fff5f5;">
+    <span class="badge" style="background:#e53e3e;">HIGH</span>
+    <span class="finding-title">Vista &#x27;OrderListView&#x27; sin permission_classes</span>
+    <span class="owasp-tag">API2</span>
+  </div>
+  <div class="finding-body">
+    <dl>
+      <dt>Regla</dt><dd>API2-NO-PERMISSION</dd>
+      <dt>Archivo</dt><dd>/Users/nohelestradap/Documents/tesis_proyecto/vulnerable_api/core/views.py:40</dd>
+      <dt>Descripción</dt><dd>La vista &#x27;OrderListView&#x27; no define permission_classes. Si DEFAULT_PERMISSION_CLASSES no está configurado en settings, cualquier usuario anónimo puede acceder al endpoint.</dd>
+    </dl>
+    <div class="evidence">class OrderListView(generics.ListCreateAPIView):</div>
+  </div>
+</div>
+<div class="finding">
+  <div class="finding-header" style="border-left-color:#e53e3e; background:#fff5f5;">
+    <span class="badge" style="background:#e53e3e;">HIGH</span>
+    <span class="finding-title">Vista &#x27;AdminPanelView&#x27; sin permission_classes</span>
+    <span class="owasp-tag">API2</span>
+  </div>
+  <div class="finding-body">
+    <dl>
+      <dt>Regla</dt><dd>API2-NO-PERMISSION</dd>
+      <dt>Archivo</dt><dd>/Users/nohelestradap/Documents/tesis_proyecto/vulnerable_api/core/views.py:47</dd>
+      <dt>Descripción</dt><dd>La vista &#x27;AdminPanelView&#x27; no define permission_classes. Si DEFAULT_PERMISSION_CLASSES no está configurado en settings, cualquier usuario anónimo puede acceder al endpoint.</dd>
+    </dl>
+    <div class="evidence">class AdminPanelView(APIView):</div>
+  </div>
+</div>
+<div class="finding">
+  <div class="finding-header" style="border-left-color:#e53e3e; background:#fff5f5;">
+    <span class="badge" style="background:#e53e3e;">HIGH</span>
+    <span class="finding-title">Acceso sin autenticación: GET /api/users/</span>
+    <span class="owasp-tag">API2</span>
+  </div>
+  <div class="finding-body">
+    <dl>
+      <dt>Regla</dt><dd>API2-UNAUTH</dd>
+      <dt>Endpoint</dt><dd>GET /api/users/</dd>
+      <dt>Descripción</dt><dd>El endpoint responde 200 sin requerir token de autenticación. Cualquier cliente puede acceder a datos sensibles sin identificarse.</dd>
+    </dl>
+    <div class="evidence">HTTP 200 (esperado 401). Body (primeros 200 chars): [{&quot;id&quot;:1,&quot;username&quot;:&quot;alice&quot;,&quot;email&quot;:&quot;alice@test.com&quot;,&quot;password&quot;:&quot;pbkdf2_sha256$600000$dqQSBrqZ32sgUzH2dxfnKr$Iqb3gdUf/XsBeJV3KOPUbz/OFMGT7UYi3AqYXV5nSqU=&quot;,&quot;is_admin&quot;:false,&quot;is_staff&quot;:false},{&quot;id&quot;:2,&quot;u</div>
+  </div>
+</div>
+<div class="finding">
+  <div class="finding-header" style="border-left-color:#e53e3e; background:#fff5f5;">
+    <span class="badge" style="background:#e53e3e;">HIGH</span>
+    <span class="finding-title">Acceso sin autenticación: GET /api/orders/</span>
+    <span class="owasp-tag">API2</span>
+  </div>
+  <div class="finding-body">
+    <dl>
+      <dt>Regla</dt><dd>API2-UNAUTH</dd>
+      <dt>Endpoint</dt><dd>GET /api/orders/</dd>
+      <dt>Descripción</dt><dd>El endpoint responde 200 sin requerir token de autenticación. Cualquier cliente puede acceder a datos sensibles sin identificarse.</dd>
+    </dl>
+    <div class="evidence">HTTP 200 (esperado 401). Body (primeros 200 chars): [{&quot;id&quot;:1,&quot;quantity&quot;:1,&quot;created_at&quot;:&quot;2026-04-06T22:39:45.739879Z&quot;,&quot;owner&quot;:1,&quot;product&quot;:1},{&quot;id&quot;:2,&quot;quantity&quot;:2,&quot;created_at&quot;:&quot;2026-04-06T22:39:45.740574Z&quot;,&quot;owner&quot;:2,&quot;product&quot;:2},{&quot;id&quot;:3,&quot;quantity&quot;:1,&quot;cre</div>
+  </div>
+</div>
+<div class="finding">
+  <div class="finding-header" style="border-left-color:#e53e3e; background:#fff5f5;">
+    <span class="badge" style="background:#e53e3e;">HIGH</span>
+    <span class="finding-title">Acceso sin autenticación: GET /api/admin-panel/</span>
+    <span class="owasp-tag">API2</span>
+  </div>
+  <div class="finding-body">
+    <dl>
+      <dt>Regla</dt><dd>API2-UNAUTH</dd>
+      <dt>Endpoint</dt><dd>GET /api/admin-panel/</dd>
+      <dt>Descripción</dt><dd>El endpoint responde 200 sin requerir token de autenticación. Cualquier cliente puede acceder a datos sensibles sin identificarse.</dd>
+    </dl>
+    <div class="evidence">HTTP 200 (esperado 401). Body (primeros 200 chars): {&quot;admin_data&quot;:[{&quot;id&quot;:1,&quot;username&quot;:&quot;alice&quot;,&quot;email&quot;:&quot;alice@test.com&quot;,&quot;is_admin&quot;:false,&quot;password&quot;:&quot;pbkdf2_sha256$600000$dqQSBrqZ32sgUzH2dxfnKr$Iqb3gdUf/XsBeJV3KOPUbz/OFMGT7UYi3AqYXV5nSqU=&quot;},{&quot;id&quot;:2,&quot;user</div>
+  </div>
+</div>
+<div class="finding">
+  <div class="finding-header" style="border-left-color:#e53e3e; background:#fff5f5;">
+    <span class="badge" style="background:#e53e3e;">HIGH</span>
+    <span class="finding-title">Campo sensible &#x27;is_admin&#x27; expuesto sin read_only en &#x27;UserSerializer&#x27;</span>
+    <span class="owasp-tag">API3</span>
+  </div>
+  <div class="finding-body">
+    <dl>
+      <dt>Regla</dt><dd>API3-SENSITIVE-FIELD</dd>
+      <dt>Archivo</dt><dd>/Users/nohelestradap/Documents/tesis_proyecto/vulnerable_api/core/serializers.py:5</dd>
+      <dt>Descripción</dt><dd>El serializer &#x27;UserSerializer&#x27; incluye &#x27;is_admin&#x27; en Meta.fields sin marcarlo como read_only. Un cliente puede modificar este campo directamente en una petición POST/PUT/PATCH (mass assignment).</dd>
+    </dl>
+    <div class="evidence">class UserSerializer(serializers.ModelSerializer):</div>
+  </div>
+</div>
+<div class="finding">
+  <div class="finding-header" style="border-left-color:#e53e3e; background:#fff5f5;">
+    <span class="badge" style="background:#e53e3e;">HIGH</span>
+    <span class="finding-title">Campo sensible &#x27;is_staff&#x27; expuesto sin read_only en &#x27;UserSerializer&#x27;</span>
+    <span class="owasp-tag">API3</span>
+  </div>
+  <div class="finding-body">
+    <dl>
+      <dt>Regla</dt><dd>API3-SENSITIVE-FIELD</dd>
+      <dt>Archivo</dt><dd>/Users/nohelestradap/Documents/tesis_proyecto/vulnerable_api/core/serializers.py:5</dd>
+      <dt>Descripción</dt><dd>El serializer &#x27;UserSerializer&#x27; incluye &#x27;is_staff&#x27; en Meta.fields sin marcarlo como read_only. Un cliente puede modificar este campo directamente en una petición POST/PUT/PATCH (mass assignment).</dd>
+    </dl>
+    <div class="evidence">class UserSerializer(serializers.ModelSerializer):</div>
+  </div>
+</div>
+<div class="finding">
+  <div class="finding-header" style="border-left-color:#e53e3e; background:#fff5f5;">
+    <span class="badge" style="background:#e53e3e;">HIGH</span>
+    <span class="finding-title">Campo sensible &#x27;password&#x27; expuesto sin read_only en &#x27;UserSerializer&#x27;</span>
+    <span class="owasp-tag">API3</span>
+  </div>
+  <div class="finding-body">
+    <dl>
+      <dt>Regla</dt><dd>API3-SENSITIVE-FIELD</dd>
+      <dt>Archivo</dt><dd>/Users/nohelestradap/Documents/tesis_proyecto/vulnerable_api/core/serializers.py:5</dd>
+      <dt>Descripción</dt><dd>El serializer &#x27;UserSerializer&#x27; incluye &#x27;password&#x27; en Meta.fields sin marcarlo como read_only. Un cliente puede modificar este campo directamente en una petición POST/PUT/PATCH (mass assignment).</dd>
+    </dl>
+    <div class="evidence">class UserSerializer(serializers.ModelSerializer):</div>
+  </div>
+</div>
+<div class="finding">
+  <div class="finding-header" style="border-left-color:#e53e3e; background:#fff5f5;">
+    <span class="badge" style="background:#e53e3e;">HIGH</span>
+    <span class="finding-title">Función admin accesible sin rol: GET /api/admin-panel/</span>
+    <span class="owasp-tag">API5</span>
+  </div>
+  <div class="finding-body">
+    <dl>
+      <dt>Regla</dt><dd>API5-FUNC-AUTHZ</dd>
+      <dt>Endpoint</dt><dd>GET /api/admin-panel/</dd>
+      <dt>Descripción</dt><dd>El endpoint de administración responde 200 sin requerir autenticación ni verificar que el usuario tenga rol de administrador. Cualquier cliente puede invocar funciones privilegiadas.</dd>
+    </dl>
+    <div class="evidence">HTTP 200 sin token. Body (primeros 200 chars): {&quot;admin_data&quot;:[{&quot;id&quot;:1,&quot;username&quot;:&quot;alice&quot;,&quot;email&quot;:&quot;alice@test.com&quot;,&quot;is_admin&quot;:false,&quot;password&quot;:&quot;pbkdf2_sha256$600000$dqQSBrqZ32sgUzH2dxfnKr$Iqb3gdUf/XsBeJV3KOPUbz/OFMGT7UYi3AqYXV5nSqU=&quot;},{&quot;id&quot;:2,&quot;user</div>
+  </div>
+</div>
+<div class="finding">
+  <div class="finding-header" style="border-left-color:#e53e3e; background:#fff5f5;">
+    <span class="badge" style="background:#e53e3e;">HIGH</span>
+    <span class="finding-title">DEBUG=True habilitado en settings</span>
+    <span class="owasp-tag">API8</span>
+  </div>
+  <div class="finding-body">
+    <dl>
+      <dt>Regla</dt><dd>API8-DEBUG-ENABLED</dd>
+      <dt>Archivo</dt><dd>/Users/nohelestradap/Documents/tesis_proyecto/vulnerable_api/config/settings.py:8</dd>
+      <dt>Descripción</dt><dd>DEBUG=True expone stack traces completos con rutas del sistema, variables de entorno y configuración interna ante cualquier error. Debe ser False en cualquier entorno no local.</dd>
+    </dl>
+    <div class="evidence">DEBUG = True</div>
+  </div>
+</div>
+<div class="finding">
+  <div class="finding-header" style="border-left-color:#dd6b20; background:#fffaf0;">
+    <span class="badge" style="background:#dd6b20;">MEDIUM</span>
+    <span class="finding-title">Serializer &#x27;ProductSerializer&#x27; usa fields=&#x27;__all__&#x27;</span>
+    <span class="owasp-tag">API3</span>
+  </div>
+  <div class="finding-body">
+    <dl>
+      <dt>Regla</dt><dd>API3-FIELDS-ALL</dd>
+      <dt>Archivo</dt><dd>/Users/nohelestradap/Documents/tesis_proyecto/vulnerable_api/core/serializers.py:12</dd>
+      <dt>Descripción</dt><dd>&#x27;ProductSerializer&#x27; expone todos los campos del modelo con fields=&#x27;__all__&#x27;. Esto puede incluir campos sensibles no intencionados. Enumera explícitamente los campos permitidos.</dd>
+    </dl>
+    <div class="evidence">class ProductSerializer(serializers.ModelSerializer):</div>
+  </div>
+</div>
+<div class="finding">
+  <div class="finding-header" style="border-left-color:#dd6b20; background:#fffaf0;">
+    <span class="badge" style="background:#dd6b20;">MEDIUM</span>
+    <span class="finding-title">Serializer &#x27;OrderSerializer&#x27; usa fields=&#x27;__all__&#x27;</span>
+    <span class="owasp-tag">API3</span>
+  </div>
+  <div class="finding-body">
+    <dl>
+      <dt>Regla</dt><dd>API3-FIELDS-ALL</dd>
+      <dt>Archivo</dt><dd>/Users/nohelestradap/Documents/tesis_proyecto/vulnerable_api/core/serializers.py:18</dd>
+      <dt>Descripción</dt><dd>&#x27;OrderSerializer&#x27; expone todos los campos del modelo con fields=&#x27;__all__&#x27;. Esto puede incluir campos sensibles no intencionados. Enumera explícitamente los campos permitidos.</dd>
+    </dl>
+    <div class="evidence">class OrderSerializer(serializers.ModelSerializer):</div>
+  </div>
+</div>
+<div class="finding">
+  <div class="finding-header" style="border-left-color:#dd6b20; background:#fffaf0;">
+    <span class="badge" style="background:#dd6b20;">MEDIUM</span>
+    <span class="finding-title">REST_FRAMEWORK sin DEFAULT_THROTTLE_CLASSES</span>
+    <span class="owasp-tag">API4</span>
+  </div>
+  <div class="finding-body">
+    <dl>
+      <dt>Regla</dt><dd>API4-NO-THROTTLING</dd>
+      <dt>Archivo</dt><dd>/Users/nohelestradap/Documents/tesis_proyecto/vulnerable_api/config/settings.py:62</dd>
+      <dt>Descripción</dt><dd>El diccionario REST_FRAMEWORK no define DEFAULT_THROTTLE_CLASSES ni DEFAULT_THROTTLE_RATES. Sin rate limiting global, cualquier cliente puede hacer requests ilimitados (fuerza bruta, scraping, DoS).</dd>
+    </dl>
+    <div class="evidence">REST_FRAMEWORK = {</div>
+  </div>
+</div>
+<div class="finding">
+  <div class="finding-header" style="border-left-color:#dd6b20; background:#fffaf0;">
+    <span class="badge" style="background:#dd6b20;">MEDIUM</span>
+    <span class="finding-title">Sin throttling: endpoint no limita requests</span>
+    <span class="owasp-tag">API4</span>
+  </div>
+  <div class="finding-body">
+    <dl>
+      <dt>Regla</dt><dd>API4-NO-THROTTLE</dd>
+      <dt>Endpoint</dt><dd>GET /api/products/</dd>
+      <dt>Descripción</dt><dd>Se enviaron 20 requests consecutivos a /api/products/ sin recibir respuesta 429 (Too Many Requests). La API no tiene rate limiting configurado.</dd>
+    </dl>
+    <div class="evidence">20 requests respondidos sin HTTP 429.</div>
+  </div>
+</div>
+<div class="finding">
+  <div class="finding-header" style="border-left-color:#3182ce; background:#ebf8ff;">
+    <span class="badge" style="background:#3182ce;">LOW</span>
+    <span class="finding-title">Configuración SIMPLE_JWT ausente en settings</span>
+    <span class="owasp-tag">API2</span>
+  </div>
+  <div class="finding-body">
+    <dl>
+      <dt>Regla</dt><dd>API2-NO-JWT-CONFIG</dd>
+      <dt>Archivo</dt><dd>/Users/nohelestradap/Documents/tesis_proyecto/vulnerable_api/config/settings.py:1</dd>
+      <dt>Descripción</dt><dd>No se encontró la variable SIMPLE_JWT en settings. Sin configuración explícita, los tokens usan los tiempos de expiración por defecto de djangorestframework-simplejwt. Se recomienda definir ACCESS_TOKEN_LIFETIME y REFRESH_TOKEN_LIFETIME según la política de seguridad.</dd>
+    </dl>
+    <div class="evidence"># SIMPLE_JWT = { ... }  &lt;-- ausente</div>
+  </div>
+</div>
+
+  
+
+  
+<h2>Cobertura OWASP API Security Top 10</h2>
+<div class="owasp-list"><span class="owasp-chip">API1</span><span class="owasp-chip">API2</span><span class="owasp-chip">API3</span><span class="owasp-chip">API4</span><span class="owasp-chip">API5</span><span class="owasp-chip">API8</span></div>
+
+  
+<h2>Métricas de la auditoría</h2>
+<table style="border-collapse:collapse; width:100%; background:white;
+              border-radius:8px; overflow:hidden;
+              box-shadow:0 1px 3px rgba(0,0,0,.08);">
+  <tr style="background:#f7fafc;">
+    <td style="padding:10px 16px; font-weight:600; width:50%">Hallazgos estáticos (AST)</td>
+    <td style="padding:10px 16px;">19</td>
+  </tr>
+  <tr>
+    <td style="padding:10px 16px; font-weight:600;">Hallazgos dinámicos (HTTP)</td>
+    <td style="padding:10px 16px;">6</td>
+  </tr>
+  <tr style="background:#f7fafc;">
+    <td style="padding:10px 16px; font-weight:600;">Recomendaciones LLM generadas</td>
+    <td style="padding:10px 16px;">0</td>
+  </tr>
+  <tr>
+    <td style="padding:10px 16px; font-weight:600;">Categorías OWASP detectadas</td>
+    <td style="padding:10px 16px;">6 / 10</td>
+  </tr>
+</table>
+
+  <div class="footer">
+    Generado por Auditor DRF &mdash; OWASP API Security Top 10 (2023)
+  </div>
+</div>
+</body>
+</html>
