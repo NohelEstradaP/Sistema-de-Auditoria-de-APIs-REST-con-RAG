@@ -1,0 +1,524 @@
+<meta charset="UTF-8">
+<title>Kanban de Tesis</title>
+<style>
+  :root {
+    --bg: #F2F4F8;
+    --surface: #FFFFFF;
+    --surface-2: #E7EAF2;
+    --surface-2-hover: #DDE2ED;
+    --border: #D7DCE6;
+    --border-strong: #C2C9D8;
+    --text: #1B2233;
+    --text-muted: #5B6478;
+    --text-faint: #8890A0;
+    --accent: #34507A;
+    --accent-soft: #E4EAF3;
+    --good: #2E7D32;
+    --good-soft: #E4F1E4;
+    --warn: #96650F;
+    --warn-soft: #FBF0DC;
+    --todo-c: #5B6478;
+    --todo-soft: #E9EBF0;
+    --shadow: 0 1px 2px rgba(27,34,51,0.06), 0 1px 1px rgba(27,34,51,0.04);
+    --shadow-lift: 0 8px 24px rgba(27,34,51,0.16), 0 2px 6px rgba(27,34,51,0.08);
+
+    --f1: #5B7DB1; --f1-soft: #E7EDF6;
+    --f2: #3F8E7F; --f2-soft: #E2F1EE;
+    --f3: #6FA05A; --f3-soft: #E9F2E4;
+    --f4: #A8842E; --f4-soft: #F4EEDC;
+    --f5: #BD6F31; --f5-soft: #F5E9DC;
+    --f6: #AC4F3A; --f6-soft: #F5E2DE;
+    --f7: #7C5498; --f7-soft: #EDE4F2;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #10141C;
+      --surface: #1A202C;
+      --surface-2: #1F2531;
+      --surface-2-hover: #262D3B;
+      --border: #2C3444;
+      --border-strong: #3A4256;
+      --text: #E6E9F0;
+      --text-muted: #99A2B5;
+      --text-faint: #6B7488;
+      --accent: #8CA9DA;
+      --accent-soft: #232B3D;
+      --good: #7BD088;
+      --good-soft: #1D2E22;
+      --warn: #E3B75B;
+      --warn-soft: #332A17;
+      --todo-c: #99A2B5;
+      --todo-soft: #232838;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3);
+      --shadow-lift: 0 10px 28px rgba(0,0,0,0.5);
+
+      --f1: #86A5D6; --f1-soft: #202A3C;
+      --f2: #62B4A3; --f2-soft: #1B2E2A;
+      --f3: #93C078; --f3-soft: #212E1C;
+      --f4: #D2B463; --f4-soft: #322B18;
+      --f5: #DE9A63; --f5-soft: #33271A;
+      --f6: #CE8571; --f6-soft: #332019;
+      --f7: #B08AC9; --f7-soft: #2A2032;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #10141C;
+    --surface: #1A202C;
+    --surface-2: #1F2531;
+    --surface-2-hover: #262D3B;
+    --border: #2C3444;
+    --border-strong: #3A4256;
+    --text: #E6E9F0;
+    --text-muted: #99A2B5;
+    --text-faint: #6B7488;
+    --accent: #8CA9DA;
+    --accent-soft: #232B3D;
+    --good: #7BD088;
+    --good-soft: #1D2E22;
+    --warn: #E3B75B;
+    --warn-soft: #332A17;
+    --todo-c: #99A2B5;
+    --todo-soft: #232838;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3);
+    --shadow-lift: 0 10px 28px rgba(0,0,0,0.5);
+
+    --f1: #86A5D6; --f1-soft: #202A3C;
+    --f2: #62B4A3; --f2-soft: #1B2E2A;
+    --f3: #93C078; --f3-soft: #212E1C;
+    --f4: #D2B463; --f4-soft: #322B18;
+    --f5: #DE9A63; --f5-soft: #33271A;
+    --f6: #CE8571; --f6-soft: #332019;
+    --f7: #B08AC9; --f7-soft: #2A2032;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    min-height: 100vh;
+  }
+
+  .page {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 2rem 3rem;
+  }
+
+  header.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.75rem;
+  }
+
+  .title-block h1 {
+    font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+    font-weight: 400;
+    font-size: 2rem;
+    letter-spacing: 0.01em;
+    margin: 0 0 0.25rem;
+    text-wrap: balance;
+    color: var(--text);
+  }
+  .title-block p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    max-width: 52ch;
+  }
+
+  .stat-strip {
+    display: flex;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.6rem 0.95rem;
+    min-width: 96px;
+    box-shadow: var(--shadow);
+  }
+  .stat .n {
+    font-variant-numeric: tabular-nums;
+    font-size: 1.35rem;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+  .stat .l {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-top: 0.15rem;
+  }
+  .stat.todo .n { color: var(--todo-c); }
+  .stat.progress .n { color: var(--warn); }
+  .stat.done .n { color: var(--good); }
+
+  .progress-track {
+    height: 8px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    overflow: hidden;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border);
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--good), var(--f2));
+    border-radius: 999px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .progress-fill { transition: none; }
+  }
+
+  .board {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem;
+    align-items: start;
+  }
+  @media (max-width: 880px) {
+    .board { grid-template-columns: 1fr; }
+  }
+
+  .column {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 0.85rem;
+    min-height: 200px;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .column.drag-over {
+    background: var(--surface-2-hover);
+    border-color: var(--border-strong);
+  }
+
+  .column-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.2rem 0.35rem 0.7rem;
+  }
+  .column-head h2 {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-muted);
+  }
+  .column-head .count {
+    font-variant-numeric: tabular-nums;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-faint);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.1rem 0.5rem;
+  }
+
+  .cards {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    min-height: 60px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left-width: 4px;
+    border-radius: 10px;
+    padding: 0.65rem 0.75rem;
+    box-shadow: var(--shadow);
+    cursor: grab;
+    user-select: none;
+  }
+  .card:active { cursor: grabbing; }
+  .card.dragging { opacity: 0.4; }
+  .card:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .card .row1 {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.3rem;
+  }
+  .card .id {
+    font-family: "SF Mono", ui-monospace, "Cascadia Code", Menlo, Consolas, monospace;
+    font-size: 0.68rem;
+    color: var(--text-faint);
+    letter-spacing: 0.02em;
+  }
+  .card .phase-tag {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 0.05rem 0.4rem;
+    border-radius: 5px;
+    white-space: nowrap;
+  }
+  .card h3 {
+    margin: 0 0 0.35rem;
+    font-size: 0.87rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--text);
+  }
+  .card .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.6rem;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-family: "SF Mono", ui-monospace, "Cascadia Code", Menlo, Consolas, monospace;
+  }
+  .card .meta span { white-space: nowrap; }
+
+  .legend {
+    margin-top: 2.25rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.1rem;
+    align-items: center;
+  }
+  .legend .lt {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-faint);
+    margin-right: 0.3rem;
+  }
+  .legend .item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.74rem;
+    color: var(--text-muted);
+  }
+  .legend .dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    flex: none;
+  }
+
+  .hint {
+    margin-top: 0.4rem;
+    font-size: 0.72rem;
+    color: var(--text-faint);
+  }
+</style>
+
+<div class="page">
+  <header class="top">
+    <div class="title-block">
+      <h1>Kanban del Trabajo de Graduación</h1>
+      <p>Auditoría automatizada de APIs REST (DRF) con detección OWASP Top 10 e informes enriquecidos por RAG. 15 actividades, 7 fases · arrastra una tarjeta para actualizar su estado.</p>
+    </div>
+    <div class="stat-strip">
+      <div class="stat todo"><div class="n" id="count-todo">0</div><div class="l">Por hacer</div></div>
+      <div class="stat progress"><div class="n" id="count-progress">0</div><div class="l">En progreso</div></div>
+      <div class="stat done"><div class="n" id="count-done">0</div><div class="l">Completado</div></div>
+    </div>
+  </header>
+
+  <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+
+  <div class="board">
+    <section class="column" data-status="todo">
+      <div class="column-head"><h2>Por Hacer</h2><span class="count" id="head-count-todo">0</span></div>
+      <div class="cards" id="col-todo"></div>
+    </section>
+    <section class="column" data-status="progress">
+      <div class="column-head"><h2>En Progreso</h2><span class="count" id="head-count-progress">0</span></div>
+      <div class="cards" id="col-progress"></div>
+    </section>
+    <section class="column" data-status="done">
+      <div class="column-head"><h2>Completado</h2><span class="count" id="head-count-done">0</span></div>
+      <div class="cards" id="col-done"></div>
+    </section>
+  </div>
+
+  <div class="legend" id="legend">
+    <span class="lt">Fases</span>
+  </div>
+  <p class="hint">El estado se guarda en este navegador (localStorage) — recarga la página y tu tablero seguirá igual.</p>
+</div>
+
+<script>
+(function () {
+  var PHASES = {
+    F1: { label: "F1 · Marco Teórico",       varc: "--f1", vars: "--f1-soft" },
+    F2: { label: "F2 · API Vulnerable",      varc: "--f2", vars: "--f2-soft" },
+    F3: { label: "F3 · Análisis Estático",   varc: "--f3", vars: "--f3-soft" },
+    F4: { label: "F4 · Análisis Dinámico",   varc: "--f4", vars: "--f4-soft" },
+    F5: { label: "F5 · Base RAG",            varc: "--f5", vars: "--f5-soft" },
+    F6: { label: "F6 · Módulo LLM",          varc: "--f6", vars: "--f6-soft" },
+    F7: { label: "F7 · Reporte y Validación",varc: "--f7", vars: "--f7-soft" }
+  };
+
+  var TASKS = [
+    { id: "A01", phase: "F1", title: "Revisión bibliográfica OWASP, RAG, DRF", dates: "20 Mar–02 Abr", days: 10, resource: "Dev Principal", status: "done" },
+    { id: "A02", phase: "F1", title: "Redacción del marco teórico", dates: "03–14 Abr", days: 8, resource: "Dev Principal", status: "done" },
+    { id: "A03", phase: "F1", title: "Diseño de arquitectura del sistema", dates: "15–21 Abr", days: 5, resource: "Dev + Asesor", status: "done" },
+    { id: "A04", phase: "F2", title: "Configuración del entorno de desarrollo", dates: "22–24 Abr", days: 3, resource: "Dev Principal", status: "done" },
+    { id: "A05", phase: "F2", title: "Creación de APIs vulnerables (VulnDRF)", dates: "25 Abr–08 May", days: 10, resource: "Dev Principal", status: "done" },
+    { id: "A06", phase: "F2", title: "Casos de prueba OWASP", dates: "11–15 May", days: 5, resource: "Dev Principal", status: "done" },
+    { id: "A07", phase: "F3", title: "Implementar parser AST", dates: "18 May–02 Jun", days: 12, resource: "Dev Principal", status: "done" },
+    { id: "A08", phase: "F3", title: "Detectores estáticos OWASP", dates: "03–23 Jun", days: 15, resource: "Dev Principal", status: "done" },
+    { id: "A09", phase: "F4", title: "Motor de análisis dinámico (HTTP fuzzer)", dates: "03–23 Jun", days: 15, resource: "Dev Principal", status: "done" },
+    { id: "A10", phase: "F5", title: "Construcción del corpus RAG (ChromaDB)", dates: "24 Jun–07 Jul", days: 10, resource: "Dev Principal", status: "done" },
+    { id: "A11", phase: "F5", title: "Sentence-Transformers + embeddings", dates: "08–16 Jul", days: 7, resource: "Dev Principal", status: "done" },
+    { id: "A12", phase: "F6", title: "Conexión Ollama — Llama3 / Mistral 7B", dates: "17–28 Jul", days: 8, resource: "Dev Principal", status: "done" },
+    { id: "A13", phase: "F6", title: "Generador de reportes con LLM", dates: "29 Jul–11 Ago", days: 10, resource: "Dev Principal", status: "progress" },
+    { id: "A14", phase: "F7", title: "Pruebas de integración + métricas F1-score", dates: "12–27 Ago", days: 12, resource: "Dev + Usuario Eval.", status: "todo" },
+    { id: "A15", phase: "F7", title: "Documentación + empaquetado pip", dates: "28 Ago–03 Sep", days: 5, resource: "Dev Principal", status: "todo" }
+  ];
+
+  var STORAGE_KEY = "tdg-kanban-v1";
+
+  function loadState() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return {};
+      return JSON.parse(raw);
+    } catch (e) { return {}; }
+  }
+
+  function saveState(state) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+
+  var state = loadState();
+  TASKS.forEach(function (t) {
+    if (state[t.id]) t.status = state[t.id];
+  });
+
+  var STATUS_LABEL = { todo: "Por hacer", progress: "En progreso", done: "Completado" };
+
+  function buildCard(task) {
+    var card = document.createElement("div");
+    card.className = "card";
+    card.draggable = true;
+    card.tabIndex = 0;
+    card.dataset.id = task.id;
+    card.style.borderLeftColor = "var(" + PHASES[task.phase].varc + ")";
+
+    var row1 = document.createElement("div");
+    row1.className = "row1";
+
+    var idEl = document.createElement("span");
+    idEl.className = "id";
+    idEl.textContent = task.id;
+
+    var tag = document.createElement("span");
+    tag.className = "phase-tag";
+    tag.textContent = task.phase;
+    tag.style.color = "var(" + PHASES[task.phase].varc + ")";
+    tag.style.background = "var(" + PHASES[task.phase].vars + ")";
+
+    row1.appendChild(idEl);
+    row1.appendChild(tag);
+
+    var h3 = document.createElement("h3");
+    h3.textContent = task.title;
+
+    var meta = document.createElement("div");
+    meta.className = "meta";
+    var d1 = document.createElement("span"); d1.textContent = task.dates;
+    var d2 = document.createElement("span"); d2.textContent = task.days + " d.h.";
+    var d3 = document.createElement("span"); d3.textContent = task.resource;
+    meta.appendChild(d1); meta.appendChild(d2); meta.appendChild(d3);
+
+    card.appendChild(row1);
+    card.appendChild(h3);
+    card.appendChild(meta);
+
+    card.addEventListener("dragstart", function (e) {
+      card.classList.add("dragging");
+      e.dataTransfer.setData("text/plain", task.id);
+      e.dataTransfer.effectAllowed = "move";
+    });
+    card.addEventListener("dragend", function () {
+      card.classList.remove("dragging");
+    });
+
+    return card;
+  }
+
+  var columns = {
+    todo: document.getElementById("col-todo"),
+    progress: document.getElementById("col-progress"),
+    done: document.getElementById("col-done")
+  };
+
+  function render() {
+    Object.keys(columns).forEach(function (k) { columns[k].innerHTML = ""; });
+    TASKS.forEach(function (task) {
+      columns[task.status].appendChild(buildCard(task));
+    });
+    ["todo", "progress", "done"].forEach(function (k) {
+      var n = TASKS.filter(function (t) { return t.status === k; }).length;
+      document.getElementById("count-" + k).textContent = n;
+      document.getElementById("head-count-" + k).textContent = n;
+    });
+    var done = TASKS.filter(function (t) { return t.status === "done"; }).length;
+    var pct = Math.round((done / TASKS.length) * 100);
+    document.getElementById("progress-fill").style.width = pct + "%";
+  }
+
+  document.querySelectorAll(".column").forEach(function (col) {
+    var status = col.dataset.status;
+    col.addEventListener("dragover", function (e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+      col.classList.add("drag-over");
+    });
+    col.addEventListener("dragleave", function (e) {
+      if (e.target === col) col.classList.remove("drag-over");
+    });
+    col.addEventListener("drop", function (e) {
+      e.preventDefault();
+      col.classList.remove("drag-over");
+      var id = e.dataTransfer.getData("text/plain");
+      var task = TASKS.find(function (t) { return t.id === id; });
+      if (!task) return;
+      task.status = status;
+      state[id] = status;
+      saveState(state);
+      render();
+    });
+  });
+
+  var legend = document.getElementById("legend");
+  Object.keys(PHASES).forEach(function (key) {
+    var item = document.createElement("span");
+    item.className = "item";
+    var dot = document.createElement("span");
+    dot.className = "dot";
+    dot.style.background = "var(" + PHASES[key].varc + ")";
+    item.appendChild(dot);
+    item.appendChild(document.createTextNode(PHASES[key].label));
+    legend.appendChild(item);
+  });
+
+  render();
+})();
+</script>
